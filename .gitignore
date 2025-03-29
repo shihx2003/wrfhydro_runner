@@ -1,10 +1,16 @@
+# test files
 /20200801
 /Domain
 /Domain_bak
 /Domain_def
 /main.log
 /main.py
-/ref
+*ref
+test*
+*test*
+*test
+/run
+/raw_run
 
 # Python bytecode
 __pycache__/
