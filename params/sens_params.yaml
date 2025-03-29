@@ -1,0 +1,344 @@
+bexp:
+  name: bexp
+  minValue: 0.4
+  maxValue: 1.9
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+smcmax:
+  name: smcmax
+  minValue: 0.8
+  maxValue: 1.2
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+dksat:
+  name: dksat
+  minValue: 0.2
+  maxValue: 10.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+refkdt:
+  name: refkdt
+  minValue: 0.1
+  maxValue: 4.0
+  iniValue: 0.6
+  file: ''
+  adjust: ''
+  description: ''
+slope:
+  name: slope
+  minValue: 0.0
+  maxValue: 1.0
+  iniValue: 0.1
+  file: ''
+  adjust: ''
+  description: ''
+retdeprtfac:
+  name: retdeprtfac
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+lksatfac:
+  name: lksatfac
+  minValue: 10.0
+  maxValue: 10000.0
+  iniValue: 1000.0
+  file: ''
+  adjust: ''
+  description: ''
+zmax:
+  name: zmax
+  minValue: 10.0
+  maxValue: 250.0
+  iniValue: 25.0
+  file: ''
+  adjust: ''
+  description: ''
+expon:
+  name: expon
+  minValue: 1.0
+  maxValue: 8.0
+  iniValue: 1.75
+  file: ''
+  adjust: ''
+  description: ''
+cwpvt:
+  name: cwpvt
+  minValue: 0.5
+  maxValue: 2.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+vcmx25:
+  name: vcmx25
+  minValue: 0.6
+  maxValue: 1.4
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+mp:
+  name: mp
+  minValue: 0.6
+  maxValue: 1.4
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+hvt:
+  name: hvt
+  minValue: 0.25
+  maxValue: 1.5
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+mfsno:
+  name: mfsno
+  minValue: 0.5
+  maxValue: 2.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+rsurfexp:
+  name: rsurfexp
+  minValue: 1.0
+  maxValue: 6.0
+  iniValue: 5.0
+  file: ''
+  adjust: ''
+  description: ''
+nexp:
+  name: nexp
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+AXAJ:
+  name: AXAJ
+  minValue: -0.49
+  maxValue: 0.49
+  iniValue: 0.1
+  file: ''
+  adjust: ''
+  description: ''
+BXAJ:
+  name: BXAJ
+  minValue: 0.01
+  maxValue: 10.0
+  iniValue: 0.1
+  file: ''
+  adjust: ''
+  description: ''
+XXAJ:
+  name: XXAJ
+  minValue: 0.01
+  maxValue: 10.0
+  iniValue: 0.1
+  file: ''
+  adjust: ''
+  description: ''
+Bw:
+  name: Bw
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+HLINK:
+  name: HLINK
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+ChSSlp:
+  name: ChSSlp
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+MannN:
+  name: MannN
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+Loss:
+  name: Loss
+  minValue: 0.0
+  maxValue: 1.0
+  iniValue: 0.5
+  file: ''
+  adjust: ''
+  description: ''
+z0sno:
+  name: z0sno
+  minValue: 0.001
+  maxValue: 0.02
+  iniValue: 0.002
+  file: ''
+  adjust: ''
+  description: ''
+ssi:
+  name: ssi
+  minValue: 0.015
+  maxValue: 0.06
+  iniValue: 0.03
+  file: ''
+  adjust: ''
+  description: ''
+snowretfac:
+  name: snowretfac
+  minValue: 1.0e-05
+  maxValue: 0.0001
+  iniValue: 5.0e-05
+  file: ''
+  adjust: ''
+  description: ''
+swemx:
+  name: swemx
+  minValue: 0.5
+  maxValue: 2.0
+  iniValue: 1.0
+  file: ''
+  adjust: ''
+  description: ''
+tau0:
+  name: tau0
+  minValue: 100000000.0
+  maxValue: 10000.0
+  iniValue: 1000000.0
+  file: ''
+  adjust: ''
+  description: ''
+graingrowth:
+  name: graingrowth
+  minValue: 4000.0
+  maxValue: 6000.0
+  iniValue: 5000.0
+  file: ''
+  adjust: ''
+  description: ''
+extragrowth:
+  name: extragrowth
+  minValue: 5.0
+  maxValue: 15.0
+  iniValue: 10.0
+  file: ''
+  adjust: ''
+  description: ''
+dirtsoot:
+  name: dirtsoot
+  minValue: 0.1
+  maxValue: 1.0
+  iniValue: 0.3
+  file: ''
+  adjust: ''
+  description: ''
+bats_cosz:
+  name: bats_cosz
+  minValue: 1.0
+  maxValue: 2.0
+  iniValue: 2.0
+  file: ''
+  adjust: ''
+  description: ''
+bats_visnew:
+  name: bats_visnew
+  minValue: 0.94
+  maxValue: 0.99
+  iniValue: 0.95
+  file: ''
+  adjust: ''
+  description: ''
+bats_nirnew:
+  name: bats_nirnew
+  minValue: 0.59
+  maxValue: 0.75
+  iniValue: 0.65
+  file: ''
+  adjust: ''
+  description: ''
+bats_visage:
+  name: bats_visage
+  minValue: 0.1
+  maxValue: 0.3
+  iniValue: 0.2
+  file: ''
+  adjust: ''
+  description: ''
+bats_nirage:
+  name: bats_nirage
+  minValue: 0.4
+  maxValue: 0.6
+  iniValue: 0.5
+  file: ''
+  adjust: ''
+  description: ''
+bats_visdir:
+  name: bats_visdir
+  minValue: 0.3
+  maxValue: 0.5
+  iniValue: 0.4
+  file: ''
+  adjust: ''
+  description: ''
+bats_nirdir:
+  name: bats_nirdir
+  minValue: 0.3
+  maxValue: 0.5
+  iniValue: 0.4
+  file: ''
+  adjust: ''
+  description: ''
+rsurfsnow:
+  name: rsurfsnow
+  minValue: 0.1
+  maxValue: 100.0
+  iniValue: 50.0
+  file: ''
+  adjust: ''
+  description: ''
+refsnowdens:
+  name: refsnowdens
+  minValue: 0.0
+  maxValue: 1.0
+  iniValue: 0.5
+  file: ''
+  adjust: ''
+  description: ''
+frac_direct:
+  name: frac_direct
+  minValue: 0.0
+  maxValue: 1.0
+  iniValue: 0.5
+  file: ''
+  adjust: ''
+  description: ''
+frac_visible:
+  name: frac_visible
+  minValue: 0.0
+  maxValue: 1.0
+  iniValue: 0.5
+  file: ''
+  adjust: ''
+  description: ''
