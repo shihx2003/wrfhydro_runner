@@ -1,0 +1,188 @@
+BEXP:
+  name: bexp
+  minValue: 0.4
+  maxValue: 1.9
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: scale
+  description: Pore size distribution index
+SMCMAX:
+  name:
+  - smcmax
+  - SMCMAX1
+  minValue: 0.8
+  maxValue: 1.2
+  iniValue: 1.0
+  file:
+  - soil_properties.nc
+  - hydro5dtbl.nc
+  adjust: scale
+  description: Saturation soil moisture content
+DKSAT:
+  name: dksat
+  minValue: 0.2
+  maxValue: 10.0
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: scale
+  description: Saturated hydraulic conductivity
+RSURFEXP:
+  name: rsurfexp
+  minValue: 1.0
+  maxValue: 6.0
+  iniValue: 5.0
+  file: soil_properties.nc
+  adjust: replace
+  description: Exponent in the resistance equation for soil evaporation
+AXAJ:
+  name: AXAJ
+  minValue: -0.49
+  maxValue: 0.49
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: scale
+  description: Tension water distribution inflection parameter
+BXAJ:
+  name: BXAJ
+  minValue: 0.01
+  maxValue: 10.0
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: scale
+  description: Tension water distribution shape parameter
+XXAJ:
+  name: XXAJ
+  minValue: 0.01
+  maxValue: 10.0
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: scale
+  description: Free water distribution shape parameter
+SLOPE:
+  name: slope
+  minValue: 0.0
+  maxValue: 1.0
+  iniValue: 0.1
+  file: soil_properties.nc
+  adjust: replace
+  description: Linear scaling of "openness" of bottom drainage boundary
+REFKDT:
+  name: refkdt
+  minValue: 0.1
+  maxValue: 4.0
+  iniValue: 3.0
+  file: soil_properties.nc
+  adjust: replace
+  description: Reference soil conductivity parameter
+CWPVT:
+  name: cwpvt
+  minValue: 0.5
+  maxValue: 2.0
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: replace
+  description: Canopy wind parameter for canopy wind profile formulation
+VCMX25:
+  name: vcmx25
+  minValue: 0.6
+  maxValue: 1.4
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: scale
+  description: Maximum carboxylation at 25C - 25C
+MP:
+  name: mp
+  minValue: 0.6
+  maxValue: 1.4
+  iniValue: 1.0
+  file: soil_properties.nc
+  adjust: scale
+  description: Slope of Ball-Berry conductance relationship
+LKSATFAC:
+  name: LKSATFAC
+  minValue: 10.0
+  maxValue: 10000.0
+  iniValue: 1000.0
+  file: Fulldom_hires.nc
+  adjust: replace
+  description: Multiplier on lateral hydraulic conductivity
+OVROUGHRTFAC:
+  name: OVROUGHRTFAC
+  minValue: 1.0
+  maxValue: 0.1
+  iniValue: 1.0
+  file: Fulldom_hires.nc
+  adjust: replace
+  description: Overland roughness scaling factor / Surface roughness
+RETDEPRTFAC:
+  name: RETDEPRTFAC
+  minValue: 0.1
+  maxValue: 20000.0
+  iniValue: 1.0
+  file: Fulldom_hires.nc
+  adjust: replace
+  description: Multiplier on retention depth limit
+NEXP:
+  name: NEXP
+  minValue: 0.1
+  maxValue: 15.0
+  iniValue: 1.0
+  file: hydro3dtbl.nc
+  adjust: replace
+  description: Exponent in the decay function for lateral Ksat over depth
+ZMAX:
+  name: Zmax
+  minValue: 10.0
+  maxValue: 250.0
+  iniValue: 50.0
+  file: GWBUCKPARM.nc
+  adjust: replace
+  description: Maximum groundwater bucket depth
+EXPON:
+  name: Expon
+  minValue: 1.0
+  maxValue: 8.0
+  iniValue: 3.0
+  file: GWBUCKPARM.nc
+  adjust: replace
+  description: Exponent controlling rate of bucket drainage as a function of depth
+COEFF:
+  name: Coeff
+  minValue: 0.0001
+  maxValue: 0.1
+  iniValue: 0.001
+  file: GWBUCKPARM.nc
+  adjust: replace
+  description: Groundwater outflow coefficient
+Bw:
+  name: Bw
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: CHANPARM.TBL
+  adjust: scale
+  description: Parameterized width of the bottom of the stream network
+HLINK:
+  name: HLINK
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: CHANPARM.TBL
+  adjust: scale
+  description: Initial channel depth
+ChSSlp:
+  name: ChSSlp
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: CHANPARM.TBL
+  adjust: scale
+  description: Channel side slope
+MANN:
+  name: MANN
+  minValue: 0.1
+  maxValue: 10.0
+  iniValue: 1.0
+  file: CHANPARM.TBL
+  adjust: scale
+  description: Channel Manning roughness
