@@ -306,3 +306,4 @@ if __name__ == "__main__":
     model_runner.save_config()
     model_runner.copy_folder()
     model_runner.inital_params()
+    model_runner.submit_pbs_job()
