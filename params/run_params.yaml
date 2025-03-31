@@ -15,7 +15,7 @@ SMCMAX:
   iniValue: 1.0
   file:
   - soil_properties.nc
-  - hydro5dtbl.nc
+  - hydro2dtbl.nc
   adjust: scale
   description: Saturation soil moisture content
 DKSAT:
@@ -127,7 +127,7 @@ NEXP:
   minValue: 0.1
   maxValue: 15.0
   iniValue: 1.0
-  file: hydro3dtbl.nc
+  file: hydro2dtbl.nc
   adjust: replace
   description: Exponent in the decay function for lateral Ksat over depth
 ZMAX:

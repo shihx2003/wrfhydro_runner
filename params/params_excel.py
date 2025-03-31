@@ -23,7 +23,7 @@ for _, row in params_df.iterrows():
             'minValue': row['minValue'],
             'maxValue': row['maxValue'],
             'iniValue': row['iniValue'],
-            'file'    : ['soil_properties.nc', 'hydro5dtbl.nc'],
+            'file'    : ['soil_properties.nc', 'hydro2dtbl.nc'],
             'adjust'  : row['adjust'],
             'description': row['description']
         }
