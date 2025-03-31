@@ -37,11 +37,12 @@ class SimulationInfo:
         Initialize the SimulationInfo object with simulation information.
         """
         self.obj = sim_info['obj']
-        self.run_source_dir = sim_info['run_source_dir']
-        self.run_dir = sim_info['run_dir']
-        self.result_dir = sim_info['result_dir']
-        self.config_dir = sim_info['config_dir']
-        self.params_yaml = sim_info.get('params_yaml', None)
+        self.ROOT_DIR = sim_info['ROOT_DIR']
+        self.run_source_dir = os.path.join(self.ROOT_DIR, sim_info.get('run_source_dir','run_source'))
+        self.run_dir = os.path.join(self.ROOT_DIR, sim_info.get('run_dir','run'))
+        self.result_dir = os.path.join(self.ROOT_DIR, sim_info.get('result_dir','result'))
+        self.config_dir = os.path.join(self.ROOT_DIR, sim_info.get('config_dir','config'))
+        self.params_yaml = os.path.join(self.ROOT_DIR, sim_info.get('params_yaml','param/run_params.yaml'))
 
         with open(self.params_yaml, 'r', encoding='utf-8') as file:
             self.params_info = yaml.safe_load(file)
@@ -276,14 +277,9 @@ class ModelRunner:
 
 
 if __name__ == "__main__":
-    # 示例模拟信息
     sim_info = {
         'obj': 'example_obj',
-        'run_source_dir': 'F:/Haihe/Run/wrfhydro_runner/run_source',
-        'run_dir': 'F:/Haihe/Run/wrfhydro_runner/run',
-        'result_dir': 'F:/Haihe/Run/wrfhydro_runner/result',
-        'config_dir': 'F:/Haihe/Run/wrfhydro_runner/configs',
-        'params_yaml': 'F:/Haihe/Run/wrfhydro_runner/params/run_params.yaml'
+        'ROOT_DIR': 'F:/Haihe/Run/wrfhydro_runner',
     }
 
     run_info = {
