@@ -129,6 +129,8 @@ def select_nc(paraminfo, dsdict):
     files = paraminfo['file']
     value = paraminfo['value']
     adjust = paraminfo['adjust']
+    
+    logger.info(f"names: {names}, files: {files}, value: {value}, adjust: {adjust}")
 
     for name, file in zip(names, files):
         if file in dsdict:
@@ -162,18 +164,19 @@ def read_nc(dir):
     Read the netCDF file
     Read the netCDF file and return the dataset
     '''
-    nc_files = ['Fulldom_hires.nc0', 'hydro2dtbl.nc0', 'soil_properties.nc0']
+    nc_files = ['Fulldom_hires.nc0', 'hydro2dtbl.nc0', 'soil_properties.nc0', 'GWBUCKPARM.nc0']
     
     dsdict = {}
     for file in nc_files:
         try:
             ds = xr.open_dataset(os.path.join(dir, file))
+            logger.info(f"File {file[:-1]} read successfully.")
             dsdict[file[:-1]] = ds
         except:
             logger.error(f"File {file} not found in the directory.")
             logger.error(f"Exiting process [read_nc]")
             return None
-
+        
     return dsdict
 
 

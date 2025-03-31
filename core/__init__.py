@@ -10,6 +10,4 @@
 from .adjust_params import chan_param, nc_params
 from .read_params import read_params
 
-
-# Export these functions directly for easier imports
 __all__ = ['chan_param', 'nc_params', 'read_params']
