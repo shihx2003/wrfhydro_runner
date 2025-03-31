@@ -3,23 +3,23 @@ bexp:
   minValue: 0.4
   maxValue: 1.9
   iniValue: 1.0
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 smcmax:
-  name: ['smcmax', 'SMCMAX1']
+  name: smcmax
   minValue: 0.8
   maxValue: 1.2
   iniValue: 1.0
-  file: ['soil_properties.nc','hydro2dtbl.nc']
-  adjust: 'scale'
+  file: ''
+  adjust: ''
   description: ''
 dksat:
   name: dksat
   minValue: 0.2
   maxValue: 10.0
   iniValue: 1.0
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 refkdt:
@@ -27,7 +27,7 @@ refkdt:
   minValue: 0.1
   maxValue: 4.0
   iniValue: 1.0
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 slope:
@@ -35,7 +35,7 @@ slope:
   minValue: 0.0
   maxValue: 1.0
   iniValue: 0.1
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 retdeprtfac:
@@ -99,7 +99,7 @@ mp:
   minValue: 0.6
   maxValue: 1.4
   iniValue: 1.0
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 hvt:
@@ -139,7 +139,7 @@ AXAJ:
   minValue: -0.49
   maxValue: 0.49
   iniValue: 1.0
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 BXAJ:
@@ -147,7 +147,7 @@ BXAJ:
   minValue: 0.01
   maxValue: 10.0
   iniValue: 1.0
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 XXAJ:
@@ -155,7 +155,7 @@ XXAJ:
   minValue: 0.01
   maxValue: 10.0
   iniValue: 1.0
-  file: 'soil_properties.nc'
+  file: ''
   adjust: ''
   description: ''
 Bw:
@@ -187,7 +187,7 @@ MannN:
   minValue: 0.1
   maxValue: 10.0
   iniValue: 1.0
-  file: 'CHANPARM.TBL'
+  file: ''
   adjust: ''
   description: ''
 Loss:
