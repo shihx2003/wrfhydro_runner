@@ -7,41 +7,114 @@
 @Contact :   shihx2003@outlook.com
 '''
 
-# here put the import lib
-
-from core.read_params import read_yaml, chan_param, nc_params
-
+# here put the import libraries
 import os
 import shutil
 import yaml
 import logging
 import subprocess
 from datetime import datetime
-from core.read_params import read_yaml, chan_param, nc_params
+from core import chan_param, nc_params, read_params
+
+logger = logging.getLogger(__name__)
+# Configure logging
+def setup_logging(level=logging.INFO):
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(formatter)
+    root_logger = logging.getLogger()
+    root_logger.setLevel(level)
+    if root_logger.handlers:
+        root_logger.handlers.clear()
+    root_logger.addHandler(console_handler)
+    return root_logger
+setup_logging()
+
+class SimulationInfo:
+    def __init__(self, sim_info):
+        """
+        Initialize the SimulationInfo object with simulation information.
+        """
+        self.obj = sim_info['obj']
+        self.run_source_dir = sim_info['run_source_dir']
+        self.run_dir = sim_info['run_dir']
+        self.result_dir = sim_info['result_dir']
+        self.config_dir = sim_info['config_dir']
+        self.params_yaml = sim_info.get('params_yaml', None)
+
+        with open(self.params_yaml, 'r', encoding='utf-8') as file:
+            self.params_info = yaml.safe_load(file)
+        logger.info(f"Parameters information loaded from {self.params_yaml}")
+
+    def creat_work_dirs(self):
+        """
+        Check if required directories exist, create them if they don't.
+        """
+        dirs_to_check = [self.run_dir, self.result_dir, self.config_dir]
+            
+        for directory in dirs_to_check:
+            if not os.path.exists(directory):
+                logger.info(f"Directory {directory} does not exist. Creating...")
+                try:
+                    os.makedirs(directory)
+                    logger.info(f"Created directory: {directory}")
+                except Exception as e:
+                    logger.error(f"Failed to create directory {directory}: {e}")
+                    raise
+            else:
+                logger.debug(f"Directory exists: {directory}")
 
 class ModelRunner:
-    def __init__(self, sim_info):
+    def __init__(self, sim_info, run_info=None, config=None):
         """
         initialize the ModelRunner with simulation information.
         """
-        self.job_id = sim_info['job_id']
-        self.period = sim_info['period']
-        self.event_no = sim_info['event_no']
-        self.source_dir = sim_info['source_dir']
-        self.desrin_dir = sim_info['desrin_dir']
-        self.result_dir = sim_info['result_dir']
+        # Determine initialization source (sim_info dictionary or config file)
+        if run_info is not None:
+            # Initialize from sim_info dictionary
+            self.job_id = run_info['job_id']
+            self.period = run_info['period']
+            self.event_no = str(run_info['event_no'])
 
-        self.model_params = sim_info['model_params']
-        
-        self.pbs_script = sim_info.get('pbs_script', 'Hydrojob.pbs')
-        self.wrfhydrofrxst = sim_info.get('wrfhydrofrxst', 'frxst_pts_out.txt')
+            self.run_source_dir = sim_info.run_source_dir
+            self.run_dir = sim_info.run_dir
+            self.result_dir = sim_info.result_dir
+            self.config_dir = sim_info.config_dir
+
+            self.raw_run_dir = os.path.join(self.run_source_dir, self.event_no)
+
+            self.params_info = sim_info.params_info
+            self.set_params = run_info['set_params']
+            self.pbs_script = run_info.get('pbs_script', 'Hydrojob.pbs')
+            self.wrfhydrofrxst = run_info.get('wrfhydrofrxst', 'frxst_pts_out.txt')
+
+        elif config is not None:
+            # Initialize from config file
+            with open(config, 'r', encoding='utf-8') as file:
+                config_self = yaml.safe_load(file)
+            
+            self.job_id = config_self['job_id']
+            self.period = config_self['period']
+            self.event_no = config_self['event_no']
+            self.raw_run_dir = config_self['raw_run_dir']
+            self.run_dir = config_self['run_dir']
+            self.result_dir = config_self['result_dir']
+            self.set_params = config_self['set_params']
+            self.pbs_script = config_self.get('pbs_script', 'Hydrojob.pbs')
+            self.wrfhydrofrxst = config_self.get('wrfhydrofrxst', 'frxst_pts_out.txt')
+        else:
+            raise ValueError("Either sim_info or config must be provided")
+            
+        # Common initialization
         self.pbs_id = None
-        
+        self.job_dir = None
     
-    def save_config(self, config_dir):
-
+    def save_config(self, config_dir=None):
         """
         """
+        if config_dir is None:
+            config_dir = self.config_dir
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
 
@@ -54,63 +127,121 @@ class ModelRunner:
                 'job_id': self.job_id,
                 'period': self.period,
                 'event_no': self.event_no,
-                'source_dir': self.source_dir,
-                'desrin_dir': self.desrin_dir,
+                'raw_run_dir': self.raw_run_dir,
+                'run_dir': self.run_dir,
                 'result_dir': self.result_dir,
-                'model_params': self.model_params,
+                'set_params': self.set_params,
                 'pbs_script': self.pbs_script,
-                'wrfhydrofrxst': self.wrfhydrofrxst
+                'wrfhydrofrxst': self.wrfhydrofrxst,
+                'pbs_id': self.pbs_id
             }
             
             # Dump the config data to YAML file
             yaml.dump(config_data, file, default_flow_style=False)
-            print(f"模型配置已保存到 {config_file}")
-
-
-
-
-    def copy_files(self, destination_dir):
+            logger.info(f"Job {self.job_id} configuration saved to {config_file}")
+            
+    def copy_folder(self):
         """
-        从源位置复制文件到指定的目标目录。
-
-        :param destination_dir: 目标目录
         """
-        if not os.path.exists(destination_dir):
-            os.makedirs(destination_dir)
+        if not os.path.exists(self.raw_run_dir):
+            logger.error(f"raw_run_dir {self.raw_run_dir} does not exist.")
+            raise FileNotFoundError(f"raw_run_dir {self.raw_run_dir} does not exist.")
+        
+        i = 0
+        job_dir = os.path.join(self.run_dir, self.job_id)
+        while os.path.exists(job_dir):
+            logger.warning(f"desrin_dir {job_dir} already exists. Choose a new directory.")
+            i += 1
+            job_dir = os.path.join(self.run_dir, self.job_id) + f"_{i}"
+            if i > 5:
+                logger.error(f"Failed to create a new job directory after 5 attempts.")
+                raise RuntimeError(f"Failed to create a new job directory after 5 attempts.")
+            
+        os.makedirs(job_dir)
+        self.job_dir = job_dir
+        logger.info(f"Copying {self.raw_run_dir} to {self.job_dir} ...")
 
-        for file in self.source_files:
-            if os.path.exists(file):
-                shutil.copy(file, destination_dir)
-                print(f"文件 {file} 复制到 {destination_dir}")
+        try:
+            shutil.copytree(self.raw_run_dir, self.job_dir, dirs_exist_ok=True)
+            logger.info(f"Copied {self.raw_run_dir} to {self.job_dir}")
+        except Exception as e:
+            logger.error(f"Error copying folder: {e}")
+            raise RuntimeError(f"Error copying folder: {e}")
+
+    def inital_params(self, new_params=None):
+        """
+        NOTE : nc_files = ['Fulldom_hires.nc0', 'hydro2dtbl.nc0', 'soil_properties.nc0', 'GWBUCKPARM.nc0']
+        """
+        if new_params is not None:
+            self.set_params.update(new_params)
+            logger.info(f"Model parameters updated: {self.set_params}")
+
+        if self.job_dir is None:
+            logger.error("Job directory not set. Please run copy_folder() first.")
+            raise RuntimeError("Job directory not set. Please run copy_folder() first.")
+        
+        # set params
+        set_nc_param = []
+        set_chan_param = {}
+        for key, value in self.set_params.items():
+            if key == 'Bw' or key == 'HLINK' or key == 'ChSSlp' or key == 'MannN':
+                set_chan_param[key] = value
             else:
-                print(f"文件 {file} 不存在!")
+                if key not in self.params_info:
+                    logger.warning(f"Parameter {key} not found in params_info. Skipping.")
+                    raise KeyError(f"Parameter {key} not found in params_info.")
+                
+                param_info = self.params_info[key]
 
-    def adjust_parameters(self, new_params):
-        """
-        根据新参数调整模型配置。
+                if isinstance(param_info['name'], list) and isinstance(param_info['file'], list):
+                    pam = {
+                        'name': param_info['name'],
+                        'file': param_info['file'],
+                        'value': value,
+                        'adjust': param_info['adjust']
+                    }
+                elif isinstance(param_info['name'], str) and isinstance(param_info['file'], str):
+                    pam = {
+                        'name': [param_info['name']],
+                        'file': [param_info['file']],
+                        'value': value,
+                        'adjust': param_info['adjust']
+                    }
+                else:
+                    logger.error(f"Parameter {key} has inconsistent types for name and file.")
+                    raise TypeError(f"Parameter {key} has inconsistent types for name and file.")
+            set_nc_param.append(pam)
+        raw_params_files = os.path.join(self.run_source_dir, 'params_files')
 
-        :param new_params: 新的模型参数字典
-        """
-        self.model_params.update(new_params)
-        print(f"模型参数已更新: {new_params}")
+        ec_nc = nc_params(set_nc_param, raw_params_files, os.path.join(self.job_dir, 'DOMAIN'))
+        ec_chan = chan_param(set_chan_param, raw_params_files, self.job_dir)
 
-    def submit_pbs_job(self, pbs_script):
-        """
-        提交PBS作业。
+        logger.info(f'inital nc_params with exit code : {ec_nc}')
+        logger.info(f'inital chan_params with exit code : {ec_chan}')
 
-        :param pbs_script: PBS脚本文件路径
-        :return: 作业ID
+        if ec_nc == 1 and ec_chan == 1:
+            logger.info("Model parameters initialized successfully.")
+        else:
+            logger.error("Model parameters initialization failed.")
+            raise RuntimeError("Model parameters initialization failed.")
+
+    def submit_pbs_job(self):
         """
-        # 使用subprocess提交PBS作业
+        """
+        pbs_script = os.path.join(self.job_dir, self.pbs_script)
+        logger.info(f"Submitting PBS job with script: {pbs_script}")
+        
         try:
             result = subprocess.run(['qsub', pbs_script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             if result.returncode == 0:
-                self.job_id = result.stdout.strip()
-                print(f"PBS作业提交成功，作业ID: {self.job_id}")
+                self.pbs_id = result.stdout.strip()
+                logger.info(f"PBS job submitted successfully. Job ID: {self.job_id}. PBS ID: {self.pbs_id}")
             else:
-                print(f"PBS作业提交失败: {result.stderr}")
+                logger.error(f"Error submitting PBS job: {result.stderr.strip()}")
+                raise RuntimeError(f"Error submitting PBS job: {result.stderr.strip()}")
         except Exception as e:
-            print(f"提交PBS作业时发生错误: {e}")
+            logger.error(f"Exception occurred while submitting PBS job: {e}")
+            raise RuntimeError(f"Exception occurred while submitting PBS job: {e}")
 
     def collect_results(self, result_dir):
         """
@@ -119,7 +250,7 @@ class ModelRunner:
         :param result_dir: 结果存储目录
         """
         if self.job_id is None:
-            print("请先提交PBS作业！")
+            print("请先提交PBS作业并获取作业ID。")
             return
 
         # 结果存储路径设置
@@ -140,22 +271,6 @@ class ModelRunner:
         """
         运行模型模拟过程。
         """
-        print(f"开始模拟时间区间: {self.simulation_time}")
-        print(f"模拟的洪水场次: {self.flood_event}")
-        print(f"使用的模型参数: {self.model_params}")
-        
-        # 模拟开始
-        self.copy_files(self.run_files)
-        
-        # 模拟参数调整
-        # 这里你可以根据需要调整模型参数
-        # self.adjust_parameters(new_model_params)
-        
-        # 提交PBS作业
-        pbs_script = "your_pbs_script.sh"  # PBS脚本路径
-        self.submit_pbs_job(pbs_script)
-        
-        # 收集模拟结果
         self.collect_results(self.result_dir)
 
 
@@ -163,19 +278,31 @@ class ModelRunner:
 if __name__ == "__main__":
     # 示例模拟信息
     sim_info = {
-        'job_id': 'job_001',
-        'period': '2025-01-01 to 2025-01-10',
-        'event_no': 1,
-        'source_dir': '/path/to/source',
-        'desrin_dir': '/path/to/desrin',
-        'result_dir': '/path/to/results',
-        'model_params': {
-            'slope': 0.1,
-            'smcmax': 0.2,
-            'MannN': 0.03
-        }
+        'obj': 'example_obj',
+        'run_source_dir': 'F:/Haihe/Run/wrfhydro_runner/run_source',
+        'run_dir': 'F:/Haihe/Run/wrfhydro_runner/run',
+        'result_dir': 'F:/Haihe/Run/wrfhydro_runner/result',
+        'config_dir': 'F:/Haihe/Run/wrfhydro_runner/configs',
+        'params_yaml': 'F:/Haihe/Run/wrfhydro_runner/params/run_params.yaml'
     }
 
-    # 创建模型运行实例并运行
-    model_runner = ModelRunner(sim_info)
-    model_runner.save_config('/path/to/config')
+    run_info = {
+        'job_id': 'example_job',
+        'period': {'start' : datetime(2020, 1, 1, 0), 'end' : datetime(2020, 1,2, 20)},
+        'event_no': 20200801,
+        'set_params': {
+            'SMCMAX': 0.2,
+            'SLOPE': 0.1,
+            'MannN': 0.5
+        },
+        'pbs_script': 'Hydrojob.pbs',
+        'wrfhydrofrxst': 'frxst_pts_out.txt'
+    }
+
+
+    sim_info = SimulationInfo(sim_info)
+    sim_info.creat_work_dirs()
+    model_runner = ModelRunner(sim_info, run_info)
+    model_runner.save_config()
+    model_runner.copy_folder()
+    model_runner.inital_params()
