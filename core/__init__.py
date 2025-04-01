@@ -9,5 +9,6 @@
 
 from .adjust_params import chan_param, nc_params
 from .read_params import read_params
+from .WRFHydroJob import SimulationInfo, WRFHydroJob
 
-__all__ = ['chan_param', 'nc_params', 'read_params']
+__all__ = ['chan_param', 'nc_params', 'read_params', 'SimulationInfo', 'WRFHydroJob']
