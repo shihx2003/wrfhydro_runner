@@ -319,37 +319,12 @@ class ModelRunner:
             self.save_config(namemark='collect_frxst')
             raise RuntimeError(f"Error copying result file: {e}")
 
-    def monitor_pbs_job(self):
-        """
-        """
-        job_complete_event = threading.Event()
-        def monitor_job():
-            while self.job_status not in ["C", "E"]:
-                self.check_pbs_job_status()
-                time.sleep(15)
-            job_complete_event.set()
-
-        monitor_thread = threading.Thread(target=monitor_job)
-        monitor_thread.daemon = True
-        monitor_thread.start()
-        job_complete_event.wait()
-
     def run(self):
         """
         """
         self.copy_folder()
         self.inital_params()
         self.submit_pbs_job()
-        self.monitor_pbs_job()
-
-        if self.job_status == "C":
-            logger.info(f"Job {self.job_id} completed successfully.")
-            self.collect_frxst(self.result_dir)
-        elif self.job_status == "E":
-            logger.error(f"Job {self.job_id} encountered an error.")
-            self.collect_frxst(self.result_dir, '_error')
-        self.save_config()
-
 
 if __name__ == "__main__":
     sim_info = {
