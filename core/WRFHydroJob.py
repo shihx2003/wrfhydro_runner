@@ -16,22 +16,9 @@ import threading
 import subprocess
 import time
 from datetime import datetime
-from adjust_params import chan_param, nc_params
+from .adjust_params import chan_param, nc_params
 
 logger = logging.getLogger(__name__)
-# Configure logging
-def setup_logging(level=logging.INFO):
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(level)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    console_handler.setFormatter(formatter)
-    root_logger = logging.getLogger()
-    root_logger.setLevel(level)
-    if root_logger.handlers:
-        root_logger.handlers.clear()
-    root_logger.addHandler(console_handler)
-    return root_logger
-setup_logging()
 
 class SimulationInfo:
     def __init__(self, sim_info):
@@ -44,7 +31,7 @@ class SimulationInfo:
         self.run_dir = os.path.join(self.ROOT_DIR, sim_info.get('run_dir','run'))
         self.result_dir = os.path.join(self.ROOT_DIR, sim_info.get('result_dir','result'))
         self.config_dir = os.path.join(self.ROOT_DIR, sim_info.get('config_dir','configs'))
-        self.params_yaml = os.path.join(self.ROOT_DIR, sim_info.get('params_yaml','params/run_params.yaml'))
+        self.params_yaml = os.path.join(self.ROOT_DIR, sim_info.get('params_yaml',''), 'params', 'run_params.yaml')
 
         with open(self.params_yaml, 'r', encoding='utf-8') as file:
             self.params_info = yaml.safe_load(file)
@@ -86,8 +73,8 @@ class ModelRunner:
             self.result_dir = sim_info.result_dir
             self.config_dir = sim_info.config_dir
 
-            self.raw_run_dir = os.path.join(self.run_source_dir, self.event_no)
-
+            self.src_run_dir = os.path.join(self.run_source_dir, self.event_no)
+            
             self.params_info = sim_info.params_info
             self.set_params = run_info['set_params']
 
@@ -105,7 +92,7 @@ class ModelRunner:
             self.run_dir = config_self['run_dir']
             self.result_dir = config_self['result_dir']
             self.config_dir = config_self['config_dir']
-            self.raw_run_dir = config_self['raw_run_dir']
+            self.src_run_dir = config_self['src_run_dir']
             self.set_params = config_self['set_params']
 
         else:
@@ -139,7 +126,7 @@ class ModelRunner:
                 'run_dir': self.run_dir,
                 'result_dir': self.result_dir,
                 'config_dir': self.config_dir,
-                'raw_run_dir': self.raw_run_dir,
+                'src_run_dir': self.src_run_dir,
                 'set_params': self.set_params,
 
                 'pbs_id': self.pbs_id,
@@ -154,10 +141,10 @@ class ModelRunner:
     def copy_folder(self):
         """
         """
-        if not os.path.exists(self.raw_run_dir):
-            logger.error(f"raw_run_dir {self.raw_run_dir} does not exist.")
+        if not os.path.exists(self.src_run_dir):
+            logger.error(f"src_run_dir {self.src_run_dir} does not exist.")
             self.save_config(namemark='copy_folder')
-            raise FileNotFoundError(f"raw_run_dir {self.raw_run_dir} does not exist.")
+            raise FileNotFoundError(f"src_run_dir {self.src_run_dir} does not exist.")
         
         i = 0
         job_dir = os.path.join(self.run_dir, self.job_id)
@@ -172,11 +159,11 @@ class ModelRunner:
             
         os.makedirs(job_dir)
         self.job_dir = job_dir
-        logger.info(f"Copying {self.raw_run_dir} to {self.job_dir} ...")
+        logger.info(f"Copying {self.src_run_dir} to {self.job_dir} ...")
 
         try:
-            shutil.copytree(self.raw_run_dir, self.job_dir, dirs_exist_ok=True)
-            logger.info(f"Copied {self.raw_run_dir} to {self.job_dir}")
+            shutil.copytree(self.src_run_dir, self.job_dir, dirs_exist_ok=True)
+            logger.info(f"Copied {self.src_run_dir} to {self.job_dir}")
         except Exception as e:
             logger.error(f"Error copying folder: {e}")
             self.save_config(namemark='copy_folder')
@@ -195,7 +182,7 @@ class ModelRunner:
             self.save_config(namemark='inital_params')
             raise RuntimeError("Job directory not set. Please run copy_folder() first.")
         
-        # set params
+         # set params
         set_nc_param = []
         set_chan_param = {}
         for key, value in self.set_params.items():
@@ -206,7 +193,7 @@ class ModelRunner:
                     logger.warning(f"Parameter {key} not found in params_info. Skipping.")
                     self.save_config(namemark='inital_params')
                     raise KeyError(f"Parameter {key} not found in params_info.")
-                
+                    
                 param_info = self.params_info[key]
 
                 if isinstance(param_info['name'], list) and isinstance(param_info['file'], list):
@@ -227,22 +214,56 @@ class ModelRunner:
                     logger.error(f"Parameter {key} has inconsistent types for name and file.")
                     self.save_config(namemark='inital_params')
                     raise TypeError(f"Parameter {key} has inconsistent types for name and file.")
-            set_nc_param.append(pam)
-        raw_params_files = os.path.join(self.run_source_dir, 'params_files')
-
-        ec_nc = nc_params(set_nc_param, raw_params_files, os.path.join(self.job_dir, 'DOMAIN'))
-        ec_chan = chan_param(set_chan_param, raw_params_files, self.job_dir)
-
-        logger.info(f'inital nc_params with exit code : {ec_nc}')
-        logger.info(f'inital chan_params with exit code : {ec_chan}')
-
-        if ec_nc == 1 and ec_chan == 1:
-            logger.info("Model parameters initialized successfully.")
+                set_nc_param.append(pam)
+        
+        # adjust the params
+        src_params_files = os.path.join(self.run_source_dir, 'params_files')
+        if len(set_nc_param) == 0:
+            logger.warning("No nc parameters to set. Run as default param.")
+            # Copy the default parameter files
+            nc_files = ['Fulldom_hires.nc0', 'hydro2dtbl.nc0', 'soil_properties.nc0', 'GWBUCKPARM.nc0']
+            for nc_file in nc_files:
+                nc_src_file = os.path.join(src_params_files, nc_file)
+                nc_dest_file = os.path.join(self.job_dir, 'DOMAIN', nc_file[:-1])
+                if os.path.exists(nc_src_file):
+                    shutil.copy(nc_src_file, nc_dest_file)
+                    logger.info(f"Copied {nc_src_file} to {nc_dest_file} as default param.")
+                    ec_nc = 1
+                    logger.info(f'inital nc_params with exit code : {ec_nc}')
+                else:
+                    logger.error(f"Source file {nc_src_file} does not exist.")
+                    self.save_config(namemark='inital_params')
+                    raise FileNotFoundError(f"Source file {nc_src_file} does not exist.")
         else:
-            logger.error("Model parameters initialization failed.")
-            self.save_config(namemark='inital_params')
-            raise RuntimeError("Model parameters initialization failed.")
+            ec_nc = nc_params(set_nc_param, src_params_files, os.path.join(self.job_dir, 'DOMAIN'))
+            logger.info(f'inital nc_params with exit code : {ec_nc}')
 
+        # Copy the CHANPARM.TBL file
+        if len(set_chan_param) == 0:
+            logger.warning("No chan parameters to set. Run as default param.")
+            chan_src_file = os.path.join(src_params_files, 'CHANPARM.TBL.temp')
+            chan_dest_file = os.path.join(self.job_dir, 'CHANPARM.TBL')
+            if os.path.exists(chan_src_file):
+                shutil.copy(chan_src_file, chan_dest_file)
+                logger.info(f"Copied {chan_src_file} to {chan_dest_file} as default param.")
+                ec_chan = 1
+                logger.info(f'inital chan_params with exit code : {ec_chan}')
+            else:
+                logger.error(f"Source file {chan_src_file} does not exist.")
+                self.save_config(namemark='inital_params')
+                raise FileNotFoundError(f"Source file {chan_src_file} does not exist.")
+        else:
+            ec_chan = chan_param(set_chan_param, src_params_files, self.job_dir)
+            logger.info(f'inital chan_params with exit code : {ec_chan}')
+        
+        # Check if parameters were initialized successfully
+        if ec_nc == 1 and ec_chan == 1:
+            logger.info("All parameters initialized successfully.")
+        else:
+            logger.error("Error initializing parameters. with  ec_nc: {ec_nc} and ec_nc: {ec_chan}")
+            self.save_config(namemark='inital_params')
+            raise RuntimeError("Error initializing parameters.")
+        
     def submit_pbs_job(self):
         """
         """

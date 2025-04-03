@@ -172,8 +172,10 @@ def read_nc(dir):
             ds = xr.open_dataset(os.path.join(dir, file))
             logger.info(f"File {file[:-1]} read successfully.")
             dsdict[file[:-1]] = ds
-        except:
-            logger.error(f"File {file} not found in the directory.")
+        except Exception as e:
+            logger.error(f"Failed to read file {file}.")
+            logger.error(f"Error: {e}")
+            logger.error(f"File {file} not found in the directory {dir}.")
             logger.error(f"Exiting process [read_nc]")
             return None
         
