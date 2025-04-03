@@ -1,13 +1,8 @@
 #!/bin/bash
 
-NUM_PROCS=4
-WRF_HYDRO_EXE="./wrf_hydro.exe"
-LOGFILE="wrf_hydro.log"
-
-if [[ ! -f "$WRF_HYDRO_EXE" ]]; then
-    echo "Error: Can Not Find $WRF_HYDRO_EXE！Please Check The EXE Path" | tee -a "$LOGFILE"
-    exit 1
-fi
-echo "Run WRF-Hydro，Use $NUM_PROCS Core..." | tee -a "$LOGFILE"
-nohup mpirun -np "$NUM_PROCS" "$WRF_HYDRO_EXE" >> "$LOGFILE" 2>&1 &
-echo $! > wrf_hydro.pid
+source ~/anaconda3/etc/profile.d/conda.sh
+conda activate wrf_env
+echo "The environment is activated and script is running."
+nohup python3 pre_WRFHydro_Test.py > ./pre_WRFHydro.log 2>&1 &
+echo "Python script is running in the background. Check the log file for output."
+ps aux | grep pre_WRFHydro_Test.py
