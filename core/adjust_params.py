@@ -30,7 +30,36 @@ logger = logging.getLogger(__name__)
 #################
 
 
-PRECISION = 1e-6
+def is_within_precision(o_max, a_max, o_min, a_min, param_value, method="scale"):
+    '''
+    Check if the adjusted parameter is within the precision of the original parameter
+    '''
+    logger.info(f"Checking if the adjusted parameter is within the precision of the original parameter")
+    logger.info(f"Parameter value: {param_value}, method: {method}")
+    logger.info(f"Original max value: {o_max}, adjusted max value: {a_max}")
+    logger.info(f"Original min value: {o_min}, adjusted min value: {a_min}")
+    
+    ABS_PRECISION = 1e-6
+    REL_PRECISION = 1e-6
+
+    if method == "scale":
+        ref_max = o_max * param_value
+        ref_min = o_min * param_value
+
+    elif method == "replace":
+        ref_max = param_value
+        ref_min = param_value
+    else:
+        raise ValueError(f"Invalid method '{method}'. Use 'scale' or 'replace'.")
+
+    threshold_max = max(ABS_PRECISION, REL_PRECISION * abs(ref_max))
+    threshold_min = max(ABS_PRECISION, REL_PRECISION * abs(ref_min))
+
+    cond_max = abs(a_max - ref_max) <= threshold_max
+    cond_min = abs(a_min - ref_min) <= threshold_min
+
+    return cond_max and cond_min
+
 
 def adjust_value(info, ds):
     '''
@@ -59,11 +88,11 @@ def adjust_value(info, ds):
     param_value = info['value']
     param_adjust = info['adjust']
 
-    c_max = ds[param_name].max().item()
-    c_min = ds[param_name].min().item()
+    o_max = ds[param_name].max().item()
+    o_min = ds[param_name].min().item()
 
     logger.info(f"Adjusting parameter {param_name} with value {param_value} and adjust method {param_adjust}")
-    logger.info(f"Parameter {param_name} has a maximum value of {c_max} and a minimum value of {c_min}")
+    logger.info(f"Parameter {param_name} has a maximum value of {o_max} and a minimum value of {o_min}")
     logger.info(f"Starting parameter adjustment")
 
     if param_adjust == 'replace':
@@ -77,7 +106,7 @@ def adjust_value(info, ds):
             a_max = ds[param_name].min().item()
             a_min = ds[param_name].max().item()
 
-        if (a_max - param_value) < PRECISION and (param_value - a_min) < PRECISION:
+        if is_within_precision(o_max, a_max, o_min, a_min, param_value, method=param_adjust):
             logger.info(f"New max value is {a_max} and new min value is {a_min}")
             logger.info(f"Parameter {param_name} adjusted successfully to {param_value}")
             exit_code = 1
@@ -99,7 +128,7 @@ def adjust_value(info, ds):
             a_max = ds[param_name].min().item()
             a_min = ds[param_name].max().item()
 
-        if (a_max - c_max * param_value) < PRECISION and (c_min * param_value - a_min) < PRECISION:
+        if is_within_precision(o_max, a_max, o_min, a_min, param_value, method=param_adjust):
             logger.info(f"New max value is {a_max} and new min value is {a_min}")
             logger.info(f"Parameter {param_name} adjusted successfully to {param_value}")
             exit_code = 1
