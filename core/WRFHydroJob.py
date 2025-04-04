@@ -12,16 +12,25 @@ import os
 import shutil
 import yaml
 import logging
-import threading
 import subprocess
-import time
 from datetime import datetime
 from .adjust_params import chan_param, nc_params
 
 logger = logging.getLogger(__name__)
 
 class SimulationInfo:
-    def __init__(self, sim_info):
+    """
+    A class to manage simulation information and directories.
+    
+    Parameters
+    ----------
+    sim_info: dict
+        Contains information about the simulation, including directories and parameters.
+        
+        'obj': str
+        'ROOT_DIR': str
+    """
+    def __init__(self, sim_info:dict):
         """
         Initialize the SimulationInfo object with simulation information.
         """
@@ -56,16 +65,28 @@ class SimulationInfo:
                 logger.debug(f"Directory exists: {directory}")
 
 class ModelRunner:
-    def __init__(self, sim_info, run_info=None, config=None):
+    """
+    A class to manage the WRF-Hydro model simulation.
+
+    Parameters
+    ----------
+    sim_info: SimulationInfo
+        An instance of the SimulationInfo class containing simulation information.
+    job_info: dict
+        Contains information about the simulation run, including job ID, period, event number, and parameters.
+    config: str
+        Path to a configuration file in YAML format.
+    """
+
+    def __init__(self, sim_info:SimulationInfo, job_info:dict=None, config:str=None):
         """
-        initialize the ModelRunner with simulation information.
         """
         # Determine initialization source (sim_info dictionary or config file)
-        if run_info is not None:
+        if job_info is not None:
             # Initialize from sim_info dictionary
-            self.job_id = run_info['job_id']
-            self.period = run_info['period']
-            self.event_no = str(run_info['event_no'])
+            self.job_id = job_info['job_id']
+            self.period = job_info['period']
+            self.event_no = str(job_info['event_no'])
 
             self.ROOT_DIR = sim_info.ROOT_DIR
             self.run_source_dir = sim_info.run_source_dir
@@ -76,7 +97,7 @@ class ModelRunner:
             self.src_run_dir = os.path.join(self.run_source_dir, self.event_no)
             
             self.params_info = sim_info.params_info
-            self.set_params = run_info['set_params']
+            self.set_params = job_info['set_params']
 
         elif config is not None:
             # Initialize from config file
@@ -353,7 +374,7 @@ if __name__ == "__main__":
         'ROOT_DIR': '/public/home/Shihuaixuan/Run/wrfhydro_runner_test/wrfhydro_runner-main',
     }
 
-    run_info = {
+    job_info = {
         'job_id': 'test_10001',
         'period': {'start' : datetime(2020, 1, 1, 0), 'end' : datetime(2020, 1,2, 20)},
         'event_no': 'Fuping_20190804',
@@ -369,5 +390,5 @@ if __name__ == "__main__":
 
     sim_info = SimulationInfo(sim_info)
     sim_info.creat_work_dirs()
-    model_runner = ModelRunner(sim_info, run_info)
+    model_runner = ModelRunner(sim_info, job_info)
     model_runner.run()
