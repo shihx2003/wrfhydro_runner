@@ -179,7 +179,7 @@ ChSSlp:
   adjust: scale
   description: Channel side slope
 MANN:
-  name: MANN
+  name: MannN
   minValue: 0.1
   maxValue: 10.0
   iniValue: 1.0
