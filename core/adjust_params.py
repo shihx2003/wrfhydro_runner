@@ -68,9 +68,14 @@ def adjust_value(info, ds):
 
     if param_adjust == 'replace':
         ds[param_name].values[:] = param_value
-
-        a_max = ds[param_name].max().item()
-        a_min = ds[param_name].min().item()
+        
+        # fix bug: if the parameter is negative, the max and min values are swapped
+        if param_value >= 0:
+            a_max = ds[param_name].max().item()
+            a_min = ds[param_name].min().item()
+        else:
+            a_max = ds[param_name].min().item()
+            a_min = ds[param_name].max().item()
 
         if (a_max - param_value) < PRECISION and (param_value - a_min) < PRECISION:
             logger.info(f"New max value is {a_max} and new min value is {a_min}")
@@ -86,8 +91,13 @@ def adjust_value(info, ds):
     elif param_adjust == 'scale':
         ds[param_name] = ds[param_name] * param_value
 
-        a_max = ds[param_name].max().item()
-        a_min = ds[param_name].min().item()
+        # fix bug: if the parameter is negative, the max and min values are swapped
+        if param_value >= 0:
+            a_max = ds[param_name].max().item()
+            a_min = ds[param_name].min().item()
+        else:
+            a_max = ds[param_name].min().item()
+            a_min = ds[param_name].max().item()
 
         if (a_max - c_max * param_value) < PRECISION and (c_min * param_value - a_min) < PRECISION:
             logger.info(f"New max value is {a_max} and new min value is {a_min}")
