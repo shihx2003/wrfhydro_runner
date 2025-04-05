@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     sim_info = {
         'obj': 'pre_WRFHydro',
-        'ROOT_DIR': './work_dir',
+        'ROOT_DIR': '/public/home/Shihuaixuan/Run/Fuping_Run/Fuping_All_params_Sen2',
     }
     global_info = SimulationInfo(sim_info)
     global_info.creat_work_dirs()
@@ -87,5 +87,5 @@ if __name__ == "__main__":
         yaml.dump(run_jobs, f, default_flow_style=False)
 
     logger.info(f"Total jobs {len(run_jobs)}")
-    set_jobs = batch_instantiate(run_jobs, global_info)
-    schedule_and_track_jobs(set_jobs, 5)
+    set_jobs = batch_instantiate(global_info, jobs=run_jobs, configs=None)
+    schedule_and_track_jobs(set_jobs, max_num=5)
