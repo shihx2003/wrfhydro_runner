@@ -57,8 +57,8 @@ if __name__ == "__main__":
     run_jobs[default['job_id']] = default
 
     job_id_num = 10001
-    for param, info in params_info.items():
-
+    for key, info in params_info.items():
+        param_name = info['name']
         max_val = info['maxValue']
         ini_val = info['iniValue']
         min_val = info['minValue']
@@ -76,7 +76,7 @@ if __name__ == "__main__":
                 'period': {'start' : '2019-07-25', 'end' : '2019-08-17'},
                 'event_no': 'Fuping_20190804',
                 'set_params': {
-                    param: val,
+                    param_name: val,
                 },
             }
             run_jobs[temp_info['job_id']] = temp_info
