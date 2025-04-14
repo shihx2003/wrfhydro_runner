@@ -178,7 +178,7 @@ ChSSlp:
   file: CHANPARM.TBL
   adjust: scale
   description: Channel side slope
-MANN:
+MannN:
   name: MannN
   minValue: 0.1
   maxValue: 10.0
