@@ -13,6 +13,7 @@ from .WRFHydroJob import SimulationInfo, ModelRunner
 from .RunningJobs import batch_instantiate, schedule_and_track_jobs
 from .Log import Log
 
+<<<<<<< HEAD
 
 # Example simulation information
 sim_info = {
@@ -30,6 +31,8 @@ job_info = {
     }
 
 #
+=======
+>>>>>>> ec5db00 (Improve : use Log.py)
 __all__ = ['chan_param', 
            'nc_params', 
            'read_params', 

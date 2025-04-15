@@ -13,19 +13,30 @@ import logging
 from datetime import datetime
 
 class Log:
+<<<<<<< HEAD
     def __init__(self, name, logfile=None, level=logging.DEBUG):
 
         self.name = name 
         self.log = logging.getLogger(name)
+=======
+    def __init__(self, loggername=None, level=logging.DEBUG):
+        self.name = loggername if loggername else datetime.now().strftime('%Y-%m-%d-%H:%M')
+        self.log = logging.getLogger(loggername)
+>>>>>>> ec5db00 (Improve : use Log.py)
         self.log.setLevel(level)
 
         formatter = logging.Formatter('%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
         if not os.path.exists('./logs'):
             os.makedirs('./logs')
+<<<<<<< HEAD
         if logfile is None:
             logfile = name + '_' + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         file_handler = logging.FileHandler(f'./logs/{logfile}.log')
+=======
+        
+        file_handler = logging.FileHandler(f'./logs/{loggername}.log')
+>>>>>>> ec5db00 (Improve : use Log.py)
         file_handler.setLevel(level)
         file_handler.setFormatter(formatter)
 
@@ -36,4 +47,8 @@ class Log:
     
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     logger = Log().get_log()
+=======
+    logger = Log('test').get_log()
+>>>>>>> ec5db00 (Improve : use Log.py)
