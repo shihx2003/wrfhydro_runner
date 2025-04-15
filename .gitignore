@@ -1,16 +1,10 @@
 # test files
-/20200801
-/Domain
-/Domain_bak
-/Domain_def
-/main.log
-/main.py
-*ref
-
-/run/example*
-/raw_run
-/run_source/Domain*
-/run_source/Fuping_20190804
+configs/*yaml
+jobs/*test
+logs/*log
+/run/*test
+/run_source/*
+/results/*
 
 # Python bytecode
 __pycache__/
