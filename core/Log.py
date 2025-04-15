@@ -36,8 +36,4 @@ class Log:
     
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    logger = Log().get_log()
-=======
     logger = Log('test').get_log()
->>>>>>> ec5db00 (Improve : use Log.py)
