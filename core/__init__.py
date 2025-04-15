@@ -13,6 +13,23 @@ from .WRFHydroJob import SimulationInfo, ModelRunner
 from .RunningJobs import batch_instantiate, schedule_and_track_jobs
 from .Log import Log
 
+
+# Example simulation information
+sim_info = {
+        'obj': 'pre_rerun_WRFHydro',
+        'ROOT_DIR': './',
+    }
+job_info = {
+        'job_id': 'job_id',
+        'period': {'start' : '2019-07-25', 'end' : '2019-08-17'},
+        'event_no': 'Fuping_20190804',
+        'set_params': {
+        'RETDEPRTFAC': 0.1,
+        'MannN': 0.01,
+        }
+    }
+
+#
 __all__ = ['chan_param', 
            'nc_params', 
            'read_params', 

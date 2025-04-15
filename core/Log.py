@@ -13,17 +13,19 @@ import logging
 from datetime import datetime
 
 class Log:
-    def __init__(self, loggername=None, level=logging.DEBUG):
-        self.name = loggername if loggername else datetime.now().strftime('%Y-%m-%d-%H:%M')
-        self.log = logging.getLogger(loggername)
+    def __init__(self, name, logfile=None, level=logging.DEBUG):
+
+        self.name = name 
+        self.log = logging.getLogger(name)
         self.log.setLevel(level)
 
         formatter = logging.Formatter('%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
         if not os.path.exists('./logs'):
             os.makedirs('./logs')
-        
-        file_handler = logging.FileHandler(f'./logs/{loggername}.log')
+        if logfile is None:
+            logfile = name + '_' + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        file_handler = logging.FileHandler(f'./logs/{logfile}.log')
         file_handler.setLevel(level)
         file_handler.setFormatter(formatter)
 
@@ -34,4 +36,4 @@ class Log:
     
 
 if __name__ == '__main__':
-    logger = Log('test').get_log()
+    logger = Log().get_log()
