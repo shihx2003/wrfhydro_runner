@@ -1,0 +1,40 @@
+pre_10111:
+  event_no: Fuping_20190804
+  job_id: pre_10111
+  period:
+    end: '2019-08-17'
+    start: '2019-07-25'
+  set_params:
+    MannN: 0.1
+pre_10112:
+  event_no: Fuping_20190804
+  job_id: pre_10112
+  period:
+    end: '2019-08-17'
+    start: '2019-07-25'
+  set_params:
+    MannN: 2.575
+pre_10113:
+  event_no: Fuping_20190804
+  job_id: pre_10113
+  period:
+    end: '2019-08-17'
+    start: '2019-07-25'
+  set_params:
+    MannN: 5.05
+pre_10114:
+  event_no: Fuping_20190804
+  job_id: pre_10114
+  period:
+    end: '2019-08-17'
+    start: '2019-07-25'
+  set_params:
+    MannN: 7.525
+pre_10115:
+  event_no: Fuping_20190804
+  job_id: pre_10115
+  period:
+    end: '2019-08-17'
+    start: '2019-07-25'
+  set_params:
+    MannN: 10.0
