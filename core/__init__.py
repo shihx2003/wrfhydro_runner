@@ -11,7 +11,6 @@ from .adjust_params import chan_param, nc_params
 from .read_params import read_params
 from .WRFHydroJob import SimulationInfo, ModelRunner
 from .RunningJobs import batch_instantiate, schedule_and_track_jobs
-from .Log import Log
 
 
 # Example simulation information
@@ -37,5 +36,4 @@ __all__ = ['chan_param',
            'ModelRunner',
            'batch_instantiate', 
            'schedule_and_track_jobs',
-           'Log'
            ]
