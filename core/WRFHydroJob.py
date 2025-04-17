@@ -73,7 +73,7 @@ class ModelRunner:
     sim_info: SimulationInfo
         An instance of the SimulationInfo class containing simulation information.
     job_info: dict
-        Contains information about the simulation run, including job ID, period, event number, and parameters.
+        Contains information about the simulation run, including job ID, period, event number, basin,  and parameters.
     config: str
         Path to a configuration file in YAML format.
     """
@@ -87,9 +87,11 @@ class ModelRunner:
             self.job_id = job_info['job_id']
             self.period = job_info['period']
             self.event_no = str(job_info['event_no'])
-
+            self.basin = job_info.get('basin', 'params_files')
+    
             self.ROOT_DIR = sim_info.ROOT_DIR
             self.run_source_dir = sim_info.run_source_dir
+            self.src_params_dir = os.path.join(self.run_source_dir, self.basin + '_params')
             self.run_dir = sim_info.run_dir
             self.result_dir = sim_info.result_dir
             self.config_dir = sim_info.config_dir
@@ -107,9 +109,11 @@ class ModelRunner:
             self.job_id = config_self['job_id']
             self.period = config_self['period']
             self.event_no = config_self['event_no']
-
+            self.basin = config_self.get('basin', 'params_files')
+            
             self.ROOT_DIR = config_self['ROOT_DIR']
             self.run_source_dir = config_self['run_source_dir']
+            self.src_params_dir = config_self['src_params_dir']
             self.run_dir = config_self['run_dir']
             self.result_dir = config_self['result_dir']
             self.config_dir = config_self['config_dir']
@@ -141,9 +145,11 @@ class ModelRunner:
                 'job_id': self.job_id,
                 'period': self.period,
                 'event_no': self.event_no,
-
+                'basin': self.basin,
+                
                 'ROOT_DIR': self.ROOT_DIR,
                 'run_source_dir': self.run_source_dir,
+                'src_params_dir': self.src_params_dir,
                 'run_dir': self.run_dir,
                 'result_dir': self.result_dir,
                 'config_dir': self.config_dir,
@@ -238,13 +244,18 @@ class ModelRunner:
                 set_nc_param.append(pam)
         
         # adjust the params
-        src_params_files = os.path.join(self.run_source_dir, 'params_files')
+        # src_params_files = os.path.join(self.run_source_dir, 'params_files')
+        if not os.path.exists(self.src_params_dir):
+            logger.error(f"Source parameters directory {self.src_params_dir} does not exist.")
+            self.save_config(namemark='inital_params')
+            raise FileNotFoundError(f"Source parameters directory {self.src_params_dir} does not exist.")
+        
         if len(set_nc_param) == 0:
             logger.warning("No nc parameters to set. Run as default param.")
             # Copy the default parameter files
             nc_files = ['Fulldom_hires.nc0', 'hydro2dtbl.nc0', 'soil_properties.nc0', 'GWBUCKPARM.nc0']
             for nc_file in nc_files:
-                nc_src_file = os.path.join(src_params_files, nc_file)
+                nc_src_file = os.path.join(self.src_params_dir, nc_file)
                 nc_dest_file = os.path.join(self.job_dir, 'DOMAIN', nc_file[:-1])
                 if os.path.exists(nc_src_file):
                     shutil.copy(nc_src_file, nc_dest_file)
@@ -256,13 +267,13 @@ class ModelRunner:
                     self.save_config(namemark='inital_params')
                     raise FileNotFoundError(f"Source file {nc_src_file} does not exist.")
         else:
-            ec_nc = nc_params(set_nc_param, src_params_files, os.path.join(self.job_dir, 'DOMAIN'))
+            ec_nc = nc_params(set_nc_param, self.src_params_dir, os.path.join(self.job_dir, 'DOMAIN'))
             logger.info(f'inital nc_params with exit code : {ec_nc}')
 
         # Copy the CHANPARM.TBL file
         if len(set_chan_param) == 0:
             logger.warning("No chan parameters to set. Run as default param.")
-            chan_src_file = os.path.join(src_params_files, 'CHANPARM.TBL.temp')
+            chan_src_file = os.path.join(self.src_params_dir, 'CHANPARM.TBL.temp')
             chan_dest_file = os.path.join(self.job_dir, 'CHANPARM.TBL')
             if os.path.exists(chan_src_file):
                 shutil.copy(chan_src_file, chan_dest_file)
@@ -274,7 +285,7 @@ class ModelRunner:
                 self.save_config(namemark='inital_params')
                 raise FileNotFoundError(f"Source file {chan_src_file} does not exist.")
         else:
-            ec_chan = chan_param(set_chan_param, src_params_files, self.job_dir)
+            ec_chan = chan_param(set_chan_param, self.src_params_dir, self.job_dir)
             logger.info(f'inital chan_params with exit code : {ec_chan}')
         
         # Check if parameters were initialized successfully
@@ -378,6 +389,7 @@ if __name__ == "__main__":
         'job_id': 'test_10001',
         'period': {'start' : datetime(2020, 1, 1, 0), 'end' : datetime(2020, 1,2, 20)},
         'event_no': 'Fuping_20190804',
+        'basin': 'Fuping',
         'set_params': {
             'SMCMAX': 1.0,
             'SLOPE': 0.06,
