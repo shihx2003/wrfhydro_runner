@@ -31,6 +31,7 @@ sim_info = {
     'ROOT_DIR': '/public/home/Shihuaixuan/Run/Haihe_Run/2B2F_sim',
 }
 global_info = SimulationInfo(sim_info)
+global_info.creat_work_dirs()
 yaml_path = os.path.join(sim_info['ROOT_DIR'], 'jobs', 'sen_jobs.yaml')
 
 with open(yaml_path, 'r') as f:
