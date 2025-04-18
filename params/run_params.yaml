@@ -108,8 +108,8 @@ LKSATFAC:
   description: Multiplier on lateral hydraulic conductivity
 OVROUGHRTFAC:
   name: OVROUGHRTFAC
-  minValue: 1.0
-  maxValue: 0.1
+  minValue: 0.1
+  maxValue: 1.0
   iniValue: 1.0
   file: Fulldom_hires.nc
   adjust: replace
