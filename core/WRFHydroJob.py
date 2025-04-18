@@ -9,6 +9,7 @@
 
 # here put the import libraries
 import os
+import re
 import shutil
 import yaml
 import logging
@@ -378,6 +379,36 @@ class ModelRunner:
         self.copy_folder()
         self.inital_params()
         self.submit_pbs_job()
+
+    def cleanup(self):
+            """
+            """
+            if self.job_dir is not None:
+                try:
+                    pattern_LDASOUT = r"\d{4}\d{8}\d{4}\.LDASOUT_DOMAIN3"  # '201207100000.LDASOUT_DOMAIN3'
+                    pattern_diag_hydro = r"diag_hydro\.\d{5}"  # 'diag_hydro.00001'
+                    pattern_HYDRO_RST = r"HYDRO_RST\.\d{4}-\d{2}-\d{2}_\d{2}:\d{2}_DOMAIN3"  #'HYDRO_RST.2012-07-11_00:00_DOMAIN3'
+                    pattern_RESTART = r"RESTART\.\d{8}\d{2}_DOMAIN3"  # 'RESTART.2012071700_DOMAIN3'
+
+                    file_pattern = re.compile(
+                        f"^({pattern_LDASOUT}|{pattern_diag_hydro}|{pattern_HYDRO_RST}|{pattern_RESTART})$"
+                    )
+                    for filename in os.listdir(self.job_dir):
+                        file_path = os.path.join(self.job_dir, filename)
+                        
+                        if os.path.isfile(file_path) and file_pattern.match(filename):
+                            os.remove(file_path)
+                            logger.info(f"Removed file: {filename}")
+                    if not os.listdir(self.job_dir):
+                        shutil.rmtree(self.job_dir)
+                        logger.info(f"Removed job directory: {self.job_dir}")
+
+                except Exception as e:
+                    logger.error(f"Error during cleaning: {e}")
+                    self.save_config(namemark='clean')
+                    raise RuntimeError(f"Error during cleaning: {e}")
+            else:
+                logger.warning("Job directory is not set. Nothing to clean.")
 
 if __name__ == "__main__":
     sim_info = {
