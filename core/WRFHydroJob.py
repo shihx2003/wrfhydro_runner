@@ -385,7 +385,7 @@ class ModelRunner:
             """
             if self.job_dir is not None:
                 try:
-                    pattern_LDASOUT = r"\d{4}\d{8}\d{4}\.LDASOUT_DOMAIN3"  # '201207100000.LDASOUT_DOMAIN3'
+                    pattern_LDASOUT = r"\d{4}\d{2}\d{2}\d{4}\.LDASOUT_DOMAIN3"  # 匹配 'YYYYMMDDHHMM.LDASOUT_DOMAIN3'
                     pattern_diag_hydro = r"diag_hydro\.\d{5}"  # 'diag_hydro.00001'
                     pattern_HYDRO_RST = r"HYDRO_RST\.\d{4}-\d{2}-\d{2}_\d{2}:\d{2}_DOMAIN3"  #'HYDRO_RST.2012-07-11_00:00_DOMAIN3'
                     pattern_RESTART = r"RESTART\.\d{8}\d{2}_DOMAIN3"  # 'RESTART.2012071700_DOMAIN3'
