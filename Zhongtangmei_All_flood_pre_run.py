@@ -29,7 +29,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-event_no = ['20110724', '20110825','20120721', '20160719', '20180707', '20190722', '20190804', '20200718', '20200823']
+event_no = ['20080809', '20110724', '20110825','20120721', '20160719', '20180707', '20190722', '20190804', '20200718', '20200823']
 
 sim_info = {
     'obj': 'All_flood_test',
@@ -52,7 +52,7 @@ run_jobs = {}
 i=1
 for event in event_no:
     job_info = job_info.copy()
-    job_info['job_id'] = f'Test_Zhongtangmei_{i}'
+    job_info['job_id'] = f'Test_Zhongtangmei_{event}'
     job_info['event_no'] = f'Zhongtangmei_{event}'
     run_jobs[job_info['job_id']] = job_info
     i+=1
