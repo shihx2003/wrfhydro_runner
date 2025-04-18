@@ -114,6 +114,7 @@ def check_and_collect(running_id:list, set_jobs:dict):
             if set_jobs[job_id].job_status == "C":
                 logger.info(f"Job {set_jobs[job_id].job_id} completed successfully.")
                 set_jobs[job_id].collect_frxst(set_jobs[job_id].result_dir)
+                set_jobs[job_id].cleanup()
                 set_jobs[job_id].save_config()
                 to_remove.append(job_id)
 
