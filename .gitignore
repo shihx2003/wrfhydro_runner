@@ -9,7 +9,7 @@
 
 /run/example*
 /raw_run
-/run_source/Domain*
+/run_source/*
 /run_source/Fuping_20190804
 
 # Python bytecode
