@@ -64,8 +64,8 @@ def schedule_and_track_jobs(set_jobs:dict, max_num:int=5):
             logger.info(f"Job {job_id} started.")
             waiting_id.remove(job_id)
             running_id.append(job_id)
-            logger.info('waiting for 10 seconds...')
-            time.sleep(10)
+            logger.info('waiting for 2 seconds...')
+            time.sleep(2)
         except Exception as e:
             logger.error(f"Error running job {job_id}: {e}")
             waiting_id.remove(job_id)
@@ -82,7 +82,7 @@ def schedule_and_track_jobs(set_jobs:dict, max_num:int=5):
             running_id , temp_finished = check_and_collect(running_id, set_jobs)
             finished_id.extend(temp_finished)
             logger.info("Waiting for running jobs to finish...")
-            time.sleep(10)
+            time.sleep(5)
 
     logger.info("All jobs have been finished.")
     logger.info(f"Error jobs: {error_id}")
